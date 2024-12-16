@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; // Используем Routes вместо Switch
 
+
+import Navigation from "../navigation/navigation";
 import Balance from "../balance/balance";
 import BudgetForm from "../budget-form/budget-form";
 import Filters from "../filters/filters";
 import BudgetTable from "../records-table/records-table";
-import Navigation from "../navigation/navigation";
+import Notification from "../notification/notification";
+
 import BudgetCharts from "../budget-charts/budget-charts";
-import Notification from "../notification/notification"; 
 
 import './App.css';
-
 
 const App = () => {
   const [budgetData, setBudgetData] = useState(() => JSON.parse(localStorage.getItem('budgetData')) || []);
   const [filteredData, setFilteredData] = useState([]);
   const [editingRecord, setEditingRecord] = useState(null);
   const [notification, setNotification] = useState(null);
-
+  
   const categories = {
     Income: ["Зарплата", "Подарки", "Инвестиции"],
     Expense: ["Транспорт", "Еда", "Одежда", "Медицина", "Подарки"],
@@ -77,31 +79,42 @@ const App = () => {
   };
 
   return (
-    <div className="app">
-      <Navigation />
-      <Balance budgetData={budgetData} />
-      <BudgetForm
-        onAddRecord={handleAddRecord}
-        editingRecord={editingRecord !== null ? budgetData[editingRecord] : null}
-        categories={categories}
-      />
-      <button onClick={() => setShowFilters(!showFilters)}>
-        {showFilters ? "Скрыть фильтры" : "Показать фильтры"}
-      </button>
-      {showFilters && (
-        <Filters
-          categories={categories}
-          onFilterChange={handleFilterChange}
-        />
-      )}
-      <BudgetTable
-        budgetData={filteredData}
-        onEditRecord={(index) => setEditingRecord(index)}
-        onDeleteRecord={handleDeleteRecord}
-      />
-      <BudgetCharts budgetData={budgetData} />
-      {notification && <Notification message={notification} />} {/* Уведомление */}
-    </div>
+    <Router>
+      <div className="app">
+        <Navigation />
+        <Routes>
+          {/* Главная страница */}
+          <Route path="/" element={
+            <>
+              <Balance budgetData={budgetData} />
+              <BudgetForm
+                onAddRecord={handleAddRecord}
+                editingRecord={editingRecord !== null ? budgetData[editingRecord] : null}
+                categories={categories}
+              />
+              <button onClick={() => setShowFilters(!showFilters)}>
+                {showFilters ? "Скрыть фильтры" : "Показать фильтры"}
+              </button>
+              {showFilters && (
+                <Filters
+                  categories={categories}
+                  onFilterChange={handleFilterChange}
+                />
+              )}
+              <BudgetTable
+                budgetData={filteredData}
+                onEditRecord={(index) => setEditingRecord(index)}
+                onDeleteRecord={handleDeleteRecord}
+              />
+            </>
+          } />
+
+          {/* Страница с графиками */}
+          <Route path="/charts" element={<BudgetCharts budgetData={budgetData} />} />
+        </Routes>
+        {notification && <Notification message={notification} />} {/* Уведомление */}
+      </div>
+    </Router>
   );
 };
 
