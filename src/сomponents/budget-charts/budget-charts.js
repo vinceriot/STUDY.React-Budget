@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import ReactECharts from 'echarts-for-react';
 
 const BudgetCharts = ({ budgetData }) => {
@@ -12,8 +11,8 @@ const BudgetCharts = ({ budgetData }) => {
     return data.reduce((acc, item) => {
       const month = new Date(item.date).getMonth();
       if (!acc[month]) acc[month] = { expense: 0, income: 0 };
-      if (item.type === 'Расход') acc[month].expense += item.amount;
-      if (item.type === 'Доход') acc[month].income += item.amount;
+      if (item.type === 'Expense') acc[month].expense += item.amount;
+      if (item.type === 'Income') acc[month].income += item.amount;
       return acc;
     }, {});
   };
@@ -126,8 +125,8 @@ const BudgetCharts = ({ budgetData }) => {
 
   // Подготовка данных
   const groupedData = groupByMonth(budgetData);
-  const expenseData = processCategoryData(budgetData, 'Расход');
-  const incomeData = processCategoryData(budgetData, 'Доход');
+  const expenseData = processCategoryData(budgetData, 'Expense');
+  const incomeData = processCategoryData(budgetData, 'Income');
 
   // Настройки графиков
   const barChartOptions = createBarChartOptions(groupedData, MONTH_NAMES);
